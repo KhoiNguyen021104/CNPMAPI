@@ -13,14 +13,16 @@ const create = async (schedule) => {
     if (isExist) {
       return { message: 'Schedule already exists' }
     }
-    await Promise.all(
-      schedule?.details?.map(async (detail) => {
-        console.log('🚀 ~ schedule?.details?.map ~ detail:', detail)
-        vehiclesModel.update(detail.vehicleId, { status: 1 })
-        driversModel.update(detail.driverId, { status: 1 })
-      })
-    )
     const resCreated = await schedulesModel.create(schedule)
+    if (resCreated) {
+      await Promise.all(
+        schedule?.details?.map(async (detail) => {
+          console.log('🚀 ~ schedule?.details?.map ~ detail:', detail)
+          vehiclesModel.update(detail.vehicleId, { status: 1 })
+          driversModel.update(detail.driverId, { status: 1 })
+        })
+      )
+    }
     return resCreated
   } catch (error) {
     throw error
@@ -52,7 +54,16 @@ const update = async (_id, reqBody) => {
       ...reqBody,
       updatedAt: Date.now()
     }
+
     const res = await schedulesModel.update(_id, updateData)
+    if (res && reqBody.details) {
+      await Promise.all(
+        reqBody?.details?.map(async (detail) => {
+          vehiclesModel.update(detail.vehicleId, { status: 1 })
+          driversModel.update(detail.driverId, { status: 1 })
+        })
+      )
+    }
     return res
   } catch (error) {
     throw error

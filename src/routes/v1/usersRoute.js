@@ -6,6 +6,7 @@ import { usersValidation } from '~/validations/usersValidation'
 const Router = express.Router()
 
 Router.route('/login').post(usersValidation.login, usersController.login)
+Router.route('/register').post(usersValidation.register, usersController.register)
 
 Router.route('/logout')
   .delete(usersController.logout)

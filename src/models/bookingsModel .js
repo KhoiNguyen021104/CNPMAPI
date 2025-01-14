@@ -25,7 +25,7 @@ const create = async (booking) => {
     const validateData = await BOOKINGS_COLLECTION_SCHEMA.validateAsync(booking, {
       abortEarly: false
     })
-    booking.scheduleId = new ObjectId(booking.scheduleId)
+    validateData.scheduleId = new ObjectId(validateData.scheduleId)
     return await GET_DB().collection(BOOKINGS_COLLECTION_NAME).insertOne(validateData)
   } catch (error) {
     throw new Error(error)
