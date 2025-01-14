@@ -3,10 +3,19 @@
 
 import { usersModel } from '~/models/usersModel'
 
+
 const login = async (reqBody) => {
   try {
     const resLogin = await usersModel.login(reqBody)
     return resLogin
+  } catch (error) {
+    throw error
+  }
+}
+const register = async (reqBody) => {
+  try {
+    const resRegister = await usersModel.register(reqBody)
+    return resRegister
   } catch (error) {
     throw error
   }
@@ -44,7 +53,8 @@ const login = async (reqBody) => {
 // }
 
 export const usersService = {
-  login
+  login,
+  register
   // findOneById,
   // findOneByEmail,
   // update

@@ -7,6 +7,20 @@ import { usersService } from '~/services/usersService'
 import { comparePassword, hashPassword } from '~/utils/algorithms'
 import ApiError from '~/utils/ApiError'
 
+const register = async (req, res) => {
+  try {
+    const resRegister = await usersService.register(req.body)
+    if (!resRegister) {
+      return res.status(StatusCodes.BAD_REQUEST).json({ message: 'Register failed' })
+    }
+
+    return res.status(StatusCodes.OK).json(resRegister)
+  } catch (error) {
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(error)
+  }
+}
+
+
 const login = async (req, res) => {
   try {
     const resLogin = await usersService.login(req.body)
@@ -158,6 +172,7 @@ const access = async (req, res) => {
 
 export const usersController = {
   login,
+  register,
   logout,
   refreshToken,
   access

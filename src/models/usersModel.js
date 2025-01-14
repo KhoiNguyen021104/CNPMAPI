@@ -21,12 +21,27 @@ const USERS_COLLECTION_SCHEMA = Joi.object({
     .pattern(new RegExp('(?=.*[0-9])'))
     .pattern(new RegExp('(?=.*[!@#$%^&*])'))
     .required(),
+  fullname: Joi.string().required(),
+  phone: Joi.string().length(10).pattern(new RegExp('(?=.*[0-9])')).required(),
+  role: Joi.string().default('customer'),
+  createdAt: Joi.date().timestamp('javascript').default(Date.now),
   updatedAt: Joi.date().timestamp('javascript').default(null)
 })
 
 // const INVALID_GET_FIELDS = ['createdAt', 'updatedAt']
 
 // const INVALID_UPDATE_FIELDS = ['_id', 'createdAt', 'username']
+
+const register = async (user) => {
+  try {
+    const validateData = await USERS_COLLECTION_SCHEMA.validateAsync(user, {
+      abortEarly: false
+    })
+    return await GET_DB().collection(USERS_COLLECTION_NAME).insertOne(validateData)
+  } catch (error) {
+    throw new Error(error)
+  }
+}
 
 const login = async (user) => {
   try {
@@ -114,7 +129,8 @@ const login = async (user) => {
 export const usersModel = {
   USERS_COLLECTION_NAME,
   USERS_COLLECTION_SCHEMA,
-  login
+  login,
+  register
   // findOneById,
   // findOneByEmail,
   // update

@@ -4,9 +4,41 @@ import { StatusCodes } from 'http-status-codes'
 import ApiError from '~/utils/ApiError'
 import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '~/utils/validators'
 
+const register = async (req, res, next) => {
+  const correctCondition = Joi.object({
+    username: Joi.string()
+      .min(6)
+      .max(30)
+      .pattern(new RegExp('(?=.*[a-z])'))
+      .pattern(new RegExp('(?=.*[A-Z])'))
+      .pattern(new RegExp('(?=.*[0-9])'))
+      .pattern(new RegExp('(?=.*[!@#$%^&*])'))
+      .required(),
+    password: Joi.string()
+      .min(8)
+      .max(50)
+      .pattern(new RegExp('(?=.*[a-z])'))
+      .pattern(new RegExp('(?=.*[A-Z])'))
+      .pattern(new RegExp('(?=.*[0-9])'))
+      .pattern(new RegExp('(?=.*[!@#$%^&*])'))
+      .required(),
+    fullname: Joi.string().required(),
+    phone: Joi.string().length(10).pattern(new RegExp('(?=.*[0-9])')).required(),
+    role: Joi.string().default('customer')
+  })
+  try {
+    await correctCondition.validateAsync(req.body, {
+      abortEarly: false,
+      allowUnknown: true
+    })
+    next()
+  } catch (error) {
+    next(new ApiError(StatusCodes.INTERNAL_SERVER_ERROR, new Error(error).message))
+  }
+}
+
 const login = async (req, res, next) => {
   const correctCondition = Joi.object({
-    // email: Joi.string().email({ tlds: { allow: false } }).required(),
     username: Joi.string()
       .min(6)
       .max(30)
@@ -116,6 +148,7 @@ const findOneByUsername = async (req, res, next) => {
 
 export const usersValidation = {
   login,
+  register,
   findOneById,
   findOneByUsername
   // update
